@@ -1,7 +1,7 @@
 pro ds9show, filename=filename, _extra=_extra
     ; for jupyter
     ; makes only shapshots
-    ; HELP, /str, FILE_INFO(FILEPATH('idl_base64.pro',  SUBDIRECTORY='lib'))
+
     on_error, 2
     compile_opt strictarr    ; https://stackoverflow.com/questions/64500086/idl-lambda-attempt-to-subscript-is-out-of-range/64500220#64500220; otherwise IDL_BASE64 is interpreted as variable
     addpath, '/opt/USW/harris/idl86/lib/'   ; idl_base64 needs idl7.1

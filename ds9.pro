@@ -15,7 +15,7 @@ end
 
 
 
-pro DS9, Data, Opt, PORT=port, FRAME=frame, LASTFRAME=lastframe, RESET=reset, OBJ=obj, MSK=msk, TMPFILE=tmpfile, CUBE=kwcube, MOSAIC=kwmosaic, _extra=kwargs
+pro DS9, Data, Opt, PORT=port, FRAME=frame, LASTFRAME=lastframe, RESET=reset, OBJ=obj, MSK=msk, TMPFILE=tmpfile, CUBE=kwcube, MOSAIC=kwmosaic, CLEAR=clear, _extra=kwargs
 ;+
 ; NAME:
 ;       DS9
@@ -51,6 +51,7 @@ pro DS9, Data, Opt, PORT=port, FRAME=frame, LASTFRAME=lastframe, RESET=reset, OB
 ;       Any keyword is transformed into a xpa argument
 ;
 ;       IDL> ds9, cmap='bb'
+;       IDL> ds9, scale=['log', 'mode 90']
 ;       IDL> ds9, sin(dindgen(100,100)*0.005), zoom='to 4'
 ;       IDL> ds9, '../data_prod/harps_red/harps_red.flat.fits', ["cmap Heat", "cmap invert yes"], port="REDUCE"
 ;       IDL> ds9, '../data_prod/harps_red/harps_red.flat.fits', "cmap Heat -cmap invert yes"
@@ -123,7 +124,7 @@ pro DS9, Data, Opt, PORT=port, FRAME=frame, LASTFRAME=lastframe, RESET=reset, OB
          wait, 0.01  ; somehow needed (for small arrays?, due to buffering?) e.g. ds9, dindgen(10,10), port='idl', obj='10x10'
          free_lun, unit
       endif else $
-         spawn, ds9+' -title '+port+' -port 0 ' $
+         spawn, ds9+' -title '+port+' -tcl yes -port 0 ' $
                   +(keyword_set(mode)? '-'+mode:'')+tmpfile+' '$
                   +ds9opt+" &"
    endif else begin  ; pipe to the named port
@@ -141,6 +142,8 @@ pro DS9, Data, Opt, PORT=port, FRAME=frame, LASTFRAME=lastframe, RESET=reset, OB
          spawn, 'xpaset -p '+port+' frame '+string(frame) $
       else if not keyword_set(lastframe) and tmpfile ne '' then $
          spawn, 'xpaset -p '+port+' frame new'
+      if keyword_set(clear) then $
+         spawn, 'xpaset -p '+port+' regions delete all'
 
       if tmpfile eq '-' then begin
          ; print, 'using pipe'
@@ -175,6 +178,9 @@ pro DS9, Data, Opt, PORT=port, FRAME=frame, LASTFRAME=lastframe, RESET=reset, OB
 
    ; pass an OBJECT name
    ; it can be appended to the wcs; send without the -p
-   if keyword_set(obj) then spawn, 'xpaset '+port+' wcs append <<<"OBJECT = '''+obj+'''"'
+   if keyword_set(obj) then spawn, 'xpaset '+port+' wcs append <<<"OBJECT = '''+STRMID(obj, 0, 63)+'''"';  strings longer than 63 will not be displayed
+   ; or with tcl (but texts is resetted when entering image)
+   ; spawn, 'xpaset -p idl tcl "{set infobox(object) aa}"
+   ; ds9, tcl='"{set infobox(object) '+obj+'}"'
 end
 

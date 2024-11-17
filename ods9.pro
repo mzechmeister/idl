@@ -1,4 +1,4 @@
-pro ODS9, cx, cy, arg1, arg2, arg3, PORT=port, FRAME=frame, LASTFRAME=lastframe, RESET=reset, LABEL=label, TAG1=tag1, TAG2=tag2, REGFILE=regfile, COLOR=color, palette=palette, PT=pt, BOX=box, CIRCLE=circle, CURVE=CURVE, LINE=LINE, POINT=point, POLYGON=polygon, x=x, cross=cross, RED=red, BLUE=blue, GREEN=green, CLEAR=clear, header=header
+pro ODS9, cx, cy, arg1, arg2, arg3, PORT=port, FRAME=frame, LASTFRAME=lastframe, RESET=reset, LABEL=label, TAG1=tag1, TAG2=tag2, REGFILE=regfile, COLOR=color, palette=palette, PT=pt, BOX=box, CIRCLE=circle, CURVE=CURVE, LINE=LINE, POINT=point, POLYGON=polygon, x=x, cross=cross, RED=red, BLUE=blue, GREEN=green, CLEAR=clear, header=header, Obj=obj
 
 ;+
 ; NAME:
@@ -197,5 +197,7 @@ pro ODS9, cx, cy, arg1, arg2, arg3, PORT=port, FRAME=frame, LASTFRAME=lastframe,
       printf, ounit, transpose(lines)
       free_lun, ounit
    endelse
+
+   if keyword_set(obj) then spawn, 'xpaset '+port+' wcs append <<<"OBJECT = '''+STRMID(obj, 0, 63)+'''"';  strings longer than 63 will not be displayed
 
 end

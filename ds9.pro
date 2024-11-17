@@ -81,12 +81,13 @@ pro DS9, Data, Opt, PORT=port, FRAME=frame, LASTFRAME=lastframe, RESET=reset, OB
    endif
 
    ds9 = getenv('newds9') + 'ds9'
+   DEFSYSV, '!gdl', EXISTS=is_gdl
 
    if ~keyword_set(data) then $
       tmpfile = '' $  ; no data
    else if size(data,/tn) eq 'STRING' then $
       tmpfile = data $ ; save the string
-   else if keyword_set(tmpfile) && string(tmpfile) ne '-' then begin
+   else if (keyword_set(tmpfile) && string(tmpfile) ne '-') || is_gdl then begin
       ; from data create a temporary fits file
       tmpfile = 'tmp.fits'
       writefits, tmpfile, data
@@ -97,8 +98,7 @@ pro DS9, Data, Opt, PORT=port, FRAME=frame, LASTFRAME=lastframe, RESET=reset, OB
       dim += ",bitpix="+(['', '8', '16', '32', '-32', '-64', '', '', '', '', '', '', '-16', '32', '64', '64'])[size(data,/type)]
       ; -16 unsigned int; -32 float; -64 double;
    endelse
-
-   if ~keyword_set(port) then port = 'idl'
+   if ~keyword_set(port) then port = is_gdl? 'gdl' : 'idl'
    mode = ''
    if keyword_set(kwcube) then mode = 'mecube '
    if keyword_set(kwmosaic) then mode = 'mosaicimage '+(kwmosaic eq 1? 'iraf ': kwmosaic)
